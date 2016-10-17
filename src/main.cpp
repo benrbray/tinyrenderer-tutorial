@@ -1,7 +1,6 @@
 #include <cmath>
 #include <stdio.h>
 #include "tgaimage.h"
-#include "model.h"
 
 using namespace std;
 
