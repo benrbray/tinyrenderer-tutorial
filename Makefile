@@ -4,15 +4,18 @@ LIBS   := -lm
 
 SRCDIR   := src
 BUILDDIR := build
-BINDIR   := bin
+OUTDIR   := bin
+TESTDIR  := tests
 INCDIR   := include
 TARGET   := bin/tinyrenderer
+
+# main compilation -------------------------------------------------------------
 
 SOURCES := $(shell find $(SRCDIR) -type f -name *.cpp)
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.cpp=.o))
 
 all: $(OBJECTS)
-	@mkdir -p $(BINDIR)
+	@mkdir -p $(OUTDIR)
 	@echo "Linking..."
 	@$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS) $(LIBS)
 	@echo "Running Tinyrenderer..."
@@ -23,6 +26,20 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
 	@mkdir -p $(BUILDDIR)
 	@$(CC) -c $(CFLAGS) -I $(INCDIR) $< -o $@
 
+# tests ------------------------------------------------------------------------
+
+TESTSRC := $(shell find $(TESTDIR) -type f -name *.cpp)
+TESTOUT := $(patsubst $(TESTDIR)/%,$(OUTDIR)/%, $(basename $(TESTSRC)))
+
+.PHONY: test
+test: $(TESTOUT)
+
+$(OUTDIR)/%: $(TESTDIR)/%.cpp
+	@mkdir -p $(OUTDIR)
+	$(CC) $(CFLAGS) -I $(INCDIR) $< -o $@ $(LIBS)
+
+# clean ------------------------------------------------------------------------
+
 clean:
-	-rm -r $(BUILDDIR) $(BINDIR)
+	-rm -r $(BUILDDIR) $(OUTDIR)
 	-rm -f *.tga
