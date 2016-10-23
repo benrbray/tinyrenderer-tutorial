@@ -1,6 +1,7 @@
 #include <cmath>
 #include <stdio.h>
 #include "tgaimage.h"
+#include "model.h"
 
 using namespace std;
 
@@ -60,12 +61,36 @@ void draw(TGAImage &image){
 	line(10, 80, 70, 20, image, white);
 }
 
+void drawWireframe(const char* filename, TGAImage &image){
+	// read model
+	Model model(filename);
+	float scale = 400;
+	int centerX = 500;
+	int centerY = 500;
+
+	// loop over faces
+	for(int k = 0; k < model.numFaces(); k++){
+		std::vector<int> face = model.face(k);
+		for(int j = 0; j < 3; j++){
+			Vec3f from = model.vertex(face[j]);
+			Vec3f to = model.vertex(face[(j+1) % 3]);
+
+			int x0 = centerX + (int)(from.z * scale);
+			int y0 = centerY + (int)(from.y * scale);
+			int x1 = centerX + (int)(to.z * scale);
+			int y1 = centerY + (int)(to.y * scale);
+
+			line(x0,y0,x1,y1, image, white);
+		}
+	}
+}
+
 // Main ------------------------------------------------------------------------
 
 int main(int argc, char** argv) {
-	TGAImage image(100, 100, TGAImage::RGB);
+	TGAImage image(1000, 1000, TGAImage::RGB);
 
-	draw(image);
+	drawWireframe("obj/head.obj", image);
 
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");

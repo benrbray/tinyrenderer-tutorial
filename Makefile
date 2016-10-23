@@ -1,5 +1,5 @@
 CC     := g++
-CFLAGS := -g -Wall
+CFLAGS := -g -Wall -Wunused-variable
 LIBS   := -lm
 
 SRCDIR   := src
@@ -28,15 +28,24 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
 
 # tests ------------------------------------------------------------------------
 
-TESTSRC := $(shell find $(TESTDIR) -type f -name *.cpp)
-TESTOUT := $(patsubst $(TESTDIR)/%,$(OUTDIR)/%, $(basename $(TESTSRC)))
-
 .PHONY: test
-test: $(TESTOUT)
+test: test-vec2f test-vec2i test-vec3f test-model
 
-$(OUTDIR)/%: $(TESTDIR)/%.cpp
+test-vec2f: tests/test-vec2f.cpp
 	@mkdir -p $(OUTDIR)
-	$(CC) $(CFLAGS) -I $(INCDIR) $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) -I $(INCDIR) $< -o $(OUTDIR)/test-vec2f $(LIBS)
+
+test-vec2i: tests/test-vec2i.cpp
+	@mkdir -p $(OUTDIR)
+	$(CC) $(CFLAGS) -I $(INCDIR) $< -o $(OUTDIR)/test-vec2i $(LIBS)
+
+test-vec3f: tests/test-vec3f.cpp
+	@mkdir -p $(OUTDIR)
+	$(CC) $(CFLAGS) -I $(INCDIR) $< -o $(OUTDIR)/test-vec3f $(LIBS)
+
+test-model: tests/test-model.cpp $(BUILDDIR)/model.o
+	@mkdir -p $(OUTDIR)
+	$(CC) $(CFLAGS) -I $(INCDIR) $^ -o $(OUTDIR)/test-model $(LIBS)
 
 # clean ------------------------------------------------------------------------
 
