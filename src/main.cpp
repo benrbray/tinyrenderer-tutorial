@@ -40,7 +40,7 @@ void drawWireframe(const char* filename, TGAImage &image, float *zbuffer){
 	Model model(filename);
 
 	// light direction
-	Vec3f lightSource(0.0, 0.0, -1.0);
+	Vec3f lightSource(1.0, 0.0, 0.0);
 
 	// loop over faces
 	for(int k = 0; k < model.numFaces(); k++){
