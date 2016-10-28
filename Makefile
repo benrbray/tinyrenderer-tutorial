@@ -1,5 +1,5 @@
 CC     := g++
-CFLAGS := -g -Wall -Wunused-variable
+CFLAGS := -std=c++11 -g -Wall -Wunused-variable
 LIBS   := -lm
 
 SRCDIR   := src
