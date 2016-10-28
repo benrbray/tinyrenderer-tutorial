@@ -2,6 +2,7 @@
 #include <cassert>
 #include <stdio.h>
 #include <iostream>
+#include <limits>
 #include "tgaimage.h"
 #include "vector.h"
 #include "model.h"
@@ -9,6 +10,11 @@
 
 using namespace std;
 
+// screen dimensions
+const int WIDTH = 800;
+const int HEIGHT = 800;
+
+// colors
 const TGAColor white = TGAColor(255, 255, 255, 255);
 const TGAColor red   = TGAColor(255, 0,   0,   255);
 const TGAColor green = TGAColor(0,   255, 0,   255);
@@ -16,20 +22,22 @@ const TGAColor blue  = TGAColor(0,   0,   255, 255);
 
 // Draw ------------------------------------------------------------------------
 
-void draw(TGAImage &image){
-	Vec2i t0[3] = {Vec2i(10, 70),   Vec2i(50, 160),  Vec2i(70, 80)};
-	Vec2i t1[3] = {Vec2i(180, 50),  Vec2i(150, 1),   Vec2i(70, 180)};
-	Vec2i t2[3] = {Vec2i(180, 150), Vec2i(120, 160), Vec2i(130, 180)};
-	triangle(t0, image, red);
-	triangle(t1, image, white);
-	triangle(t2, image, green);
+Vec3f world2screen(Vec3f v){
+	return Vec3f((v.x+1.)*WIDTH/2, (v.y+1.)*HEIGHT/2, v.z);
 }
 
-void drawWireframe(const char* filename, TGAImage &image){
+void draw(TGAImage &image, float *zbuffer){
+	Vec3f t0[3] = {Vec3f(10, 70, 0),   Vec3f(50, 160, 0),  Vec3f(70, 80, 0)};
+	Vec3f t1[3] = {Vec3f(180, 50, 0),  Vec3f(150, 1, 0),   Vec3f(70, 180, 0)};
+	Vec3f t2[3] = {Vec3f(180, 150, 0), Vec3f(120, 160, 0), Vec3f(130, 180, 0)};
+	triangle(t0, zbuffer, image, red);
+	triangle(t1, zbuffer, image, white);
+	triangle(t2, zbuffer, image, green);
+}
+
+void drawWireframe(const char* filename, TGAImage &image, float *zbuffer){
 	// read model
 	Model model(filename);
-	int width = image.get_width();
-	int height = image.get_height();
 
 	// light direction
 	Vec3f lightSource(0.0, 0.0, -1.0);
@@ -39,11 +47,11 @@ void drawWireframe(const char* filename, TGAImage &image){
 		std::vector<int> face = model.face(k);
 
 		// compute screen and world coordinates
-		Vec2i screen[3];
+		Vec3f screen[3];
 		Vec3f world[3];
 		for(int j = 0; j < 3; j++){
 			Vec3f p = model.vertex(face[j]);
-			screen[j] = Vec2i((p.x+1)*width/2, (p.y+1)*height/2);
+			screen[j] = world2screen(p);
 			world[j]  = p;
 		}
 
@@ -55,7 +63,7 @@ void drawWireframe(const char* filename, TGAImage &image){
 
 		if(intensity > 0){
 			int c = intensity * 255;
-			triangle(screen, image, TGAColor(c, c, c, 255));
+			triangle(screen, zbuffer, image, TGAColor(c, c, c, 255));
 		}
 	}
 }
@@ -63,10 +71,15 @@ void drawWireframe(const char* filename, TGAImage &image){
 // Main ------------------------------------------------------------------------
 
 int main(int argc, char** argv) {
-	int width = 800, height = 800;
-	TGAImage image(width, height, TGAImage::RGB);
+	// create image
+	TGAImage image(WIDTH, HEIGHT, TGAImage::RGB);
 
-	drawWireframe("obj/head.obj", image);
+	// create zbuffer
+	float zbuffer[WIDTH*HEIGHT];
+	for(int k = 0; k < WIDTH*HEIGHT; k++) zbuffer[k] = -numeric_limits<float>::max();
+
+	// draw wireframe
+	drawWireframe("obj/head.obj", image, zbuffer);
 
 	image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");
