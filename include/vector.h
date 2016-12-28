@@ -2,6 +2,7 @@
 #define __VECTOR_H__
 
 #include <cmath>
+#include <cassert>
 
 //// TEMPLATES /////////////////////////////////////////////////////////////////
 
@@ -9,15 +10,24 @@
 
 template <class T>
 struct Vec2 {
-    T x,y;
+    union {
+        struct{ T x,y; };
+        struct{ T u,v; };
+        T data[2];
+    };
 
     Vec2(): x(0),y(0) {}
     Vec2(T xx, T yy): x(xx),y(yy) {}
 
+    // arithmetic operators
     Vec2<T>& operator +=(const Vec2<T> &b){  x += b.x; y += b.y; return *this; }
     Vec2<T>& operator -=(const Vec2<T> &b){  x -= b.x; y -= b.y; return *this; }
     Vec2<T>& operator *=(const float &b){   x *= b;   y *= b;   return *this; }
     Vec2<T>& operator /=(const float &b){   x /= b;   y /= b;   return *this; }
+
+    // array access
+          T& operator [](const size_t idx)       { assert(idx < 2); return data[idx]; }
+    const T& operator [](const size_t idx) const { assert(idx < 2); return data[idx]; }
 };
 
 typedef Vec2<float> Vec2f;
@@ -51,18 +61,27 @@ inline Vec2<T> operator+(Vec2<T> a, const Vec2<T> &b){
 
 template <class T>
 struct Vec3 {
-    T x,y,z;
+    union {
+        struct{ T x,y,z; };
+        struct{ T u,v,w; };
+        T data[3];
+    };
 
     Vec3(): x(0),y(0),z(0) {}
     Vec3(T xx, T yy, T zz): x(xx),y(yy),z(zz) {}
 
+    // arithmetic operators
     Vec3<T>& operator +=(const Vec3<T> &b){ x += b.x; y += b.y; z += b.z; return *this; }
     Vec3<T>& operator -=(const Vec3<T> &b){ x -= b.x; y -= b.y; z -= b.z; return *this; }
     Vec3<T>& operator *=(const float &b){ x *= b; y *= b; z *= b; return *this; }
     Vec3<T>& operator /=(const float &b){ x /= b; y /= b; z /= b; return *this; }
 
-    T dot(const Vec3<T> &b){ return x*b.x + y*b.y + z*b.z; }
+    // array access
+          T& operator [](const size_t idx)       { assert(idx < 3); return data[idx]; }
+    const T& operator [](const size_t idx) const { assert(idx < 3); return data[idx]; }
 
+    // vector operations
+    T dot(const Vec3<T> &b){ return x*b.x + y*b.y + z*b.z; }
     T norm(){ return sqrt(x*x + y*y + z*z); }
     void normalize(){  *this /= norm(); }
     void normalized(){ return *this / norm(); }

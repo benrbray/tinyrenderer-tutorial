@@ -67,7 +67,12 @@ Vec3f barycentric(const Vec3f *points, Vec3f p){
 
 // Barycentric Triangle --------------------------------------------------------
 
-void triangle(const Vec3f *points, float *zbuffer, TGAImage &image, TGAColor color) {
+void triangle(const Vec3f *screen,
+              const Vec2f *uv,
+              float *zbuffer,
+              float intensity,
+              const TGAImage &diffuse,
+              TGAImage &image) {
 	// image dimensions
 	int width = image.get_width();
 	int height = image.get_height();
@@ -75,30 +80,44 @@ void triangle(const Vec3f *points, float *zbuffer, TGAImage &image, TGAColor col
 	// compute bounding box and clip to screen
 	int xmin = width-1, xmax = 0, ymin = height-1, ymax = 0;
 	for(int k = 0; k < 3; k++){
-		xmin = min(xmin, (int)points[k].x);
-		xmax = max(xmax, (int)points[k].x);
-		ymin = min(ymin, (int)points[k].y);
-		ymax = max(ymax, (int)points[k].y);
+		xmin = min(xmin, (int)screen[k].x);
+		xmax = max(xmax, (int)screen[k].x);
+		ymin = min(ymin, (int)screen[k].y);
+		ymax = max(ymax, (int)screen[k].y);
 	}
 
     // fill in pixels within triangle
 	Vec3f p;
 	for(p.x = xmin; p.x <= xmax; p.x++){
 		for(p.y = ymin; p.y <= ymax; p.y++){
-			Vec3f bary = barycentric(points, p);
+			Vec3f bary = barycentric(screen, p);
 
             // skip pixel if outside triangle
             if(bary.x < 0 || bary.y < 0 || bary.z < 0) continue;
 
-            // compute screen z
-            float z = bary.x * points[0].z + bary.y + points[1].z + bary.z + points[2].z;
-
-            // compare against zbuffer
+            // compute screen z, compare against zbuffer
+            float z = 0;
+            for(int k = 0; k < 3; k++){ z += bary[k] * screen[k].z; }
             int idx = p.x + p.y * width;
-			if(zbuffer[idx] < z){
-                zbuffer[idx] = z;
-				image.set(p.x, p.y, color);
-			}
+            if(zbuffer[idx] > z) continue;
+
+
+
+            // interpolate color
+            float u = 0, v = 0;
+            for(int k = 0; k < 3; k++){
+                u += bary[k] * uv[k].u;
+                v += bary[k] * uv[k].v;
+            }
+
+            TGAColor original = diffuse.get((int)u,(int)v);
+            int r = intensity * original.r;
+            int g = intensity * original.g;
+            int b = intensity * original.b;
+
+            // draw
+            zbuffer[idx] = z;
+			image.set(p.x, p.y, TGAColor(r,g,b,255));
 		}
 	}
 }

@@ -7,12 +7,14 @@
 class Model {
 private:
     std::vector<Vec3f> _vertices;
-    std::vector< std::vector<int> > _faces;
+    std::vector<Vec2f> _uv;
+    std::vector<std::vector<Vec3i>> _faces;
 public:
     Model(const char *filename);
     ~Model();
     Vec3f vertex(int k);
-    std::vector<int> face(int k);
+    Vec2f uv(int k);
+    std::vector<Vec3i> face(int k);
     int numVertices();
     int numFaces();
 };

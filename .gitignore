@@ -7,3 +7,4 @@ bin/*
 
 # ignore output images
 output.tga
+debug.tga

@@ -20,7 +20,7 @@ Model::Model(const char* filename){
 
         // trash variables
         char trash;
-        int itrash;
+        float ftrash;
 
         // get keyword
         string keyword;
@@ -38,14 +38,24 @@ Model::Model(const char* filename){
         // handle face
         else if(!keyword.compare("f")){
             // create face
-            std::vector<int> face;
+            std::vector<Vec3i> face;
             // read face vertices from v/vt/vn
-            int idx;
-            while(iss >> idx >> trash >> itrash >> trash >> itrash){
-                face.push_back(--idx);
+            Vec3i tmp;
+            while(iss >> tmp[0] >> trash >> tmp[1] >> trash >> tmp[2]){
+                // convert to zero-indexing from one-indexing
+                for(int k = 0; k < 3; k++) tmp[k]--;
+                // store vertex
+                face.push_back(tmp);
             }
             // save face
             _faces.push_back(face);
+        }
+        // handle texture vertex
+        else if(!keyword.compare("vt")){
+            // read and create texture vertex
+            Vec2f uv;
+            iss >> uv.u >> uv.v >> ftrash;
+            _uv.push_back(uv);
         }
     }
 }
@@ -56,4 +66,5 @@ int Model::numVertices()   { return _vertices.size(); }
 int Model::numFaces()      { return _faces.size();    }
 
 Vec3f Model::vertex(int k) { return _vertices[k]; }
-std::vector<int> Model::face(int k) { return _faces[k]; }
+Vec2f Model::uv(int k) { return _uv[k]; }
+std::vector<Vec3i> Model::face(int k) { return _faces[k]; }

@@ -20,7 +20,7 @@ all: $(OBJECTS)
 	@$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS) $(LIBS)
 	@echo "Running Tinyrenderer..."
 	@./$(TARGET)
-	@eog output.tga
+	@eog output.tga & eog debug.tga
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
 	@mkdir -p $(BUILDDIR)
