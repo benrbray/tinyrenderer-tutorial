@@ -8,6 +8,8 @@ using std::cout;
 using std::string;
 using std::endl;
 
+//// CONSTRUCTOR ///////////////////////////////////////////////////////////////
+
 Model::Model(const char* filename){
     // open stream
     std::ifstream infile(filename);
@@ -60,11 +62,26 @@ Model::Model(const char* filename){
     }
 }
 
+// Destructor
 Model::~Model(){}
 
-int Model::numVertices()   { return _vertices.size(); }
-int Model::numFaces()      { return _faces.size();    }
+// Sizes
+int Model::numVertices()              const { return _vertices.size(); }
+int Model::numFaces()                 const { return _faces.size();    }
 
-Vec3f Model::vertex(int k) { return _vertices[k]; }
-Vec2f Model::uv(int k) { return _uv[k]; }
-std::vector<Vec3i> Model::face(int k) { return _faces[k]; }
+Vec3f Model::vertex(int k)            const { return _vertices[k]; }
+std::vector<Vec3i> Model::face(int k) const { return _faces[k]; }
+
+Vec2i Model::uv(int fidx, int vidx) const {
+    int idx = _faces[fidx][vidx][1];
+    return Vec2i(_uv[idx].u * diffuseMap.get_width(), _uv[idx].v * diffuseMap.get_height());
+}
+
+void Model::loadDiffuse(const char *diffusePath){
+	diffuseMap.read_tga_file(diffusePath);
+	diffuseMap.flip_vertically();
+}
+
+TGAColor Model::getDiffuse(int x, int y){
+    return diffuseMap.get(x,y);
+}

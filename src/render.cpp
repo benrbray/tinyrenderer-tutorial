@@ -68,7 +68,7 @@ Vec3f barycentric(const Vec3f *points, Vec3f p){
 // Barycentric Triangle --------------------------------------------------------
 
 void triangle(const Vec3f *screen,
-              const Vec2f *uv,
+              const Vec2i *uv,
               float *zbuffer,
               float intensity,
               const TGAImage &diffuse,
@@ -101,8 +101,6 @@ void triangle(const Vec3f *screen,
             int idx = p.x + p.y * width;
             if(zbuffer[idx] > z) continue;
 
-
-
             // interpolate color
             float u = 0, v = 0;
             for(int k = 0; k < 3; k++){
@@ -118,6 +116,52 @@ void triangle(const Vec3f *screen,
             // draw
             zbuffer[idx] = z;
 			image.set(p.x, p.y, TGAColor(r,g,b,255));
+		}
+	}
+}
+
+//// WIREFRAME /////////////////////////////////////////////////////////////////
+
+void drawWireframe(const char* filename, const char* diffusePath, TGAImage &image, float *zbuffer){
+	return;
+}
+
+
+//// TEXTURED //////////////////////////////////////////////////////////////////
+
+void render(const Model &model, TGAImage &image, float *zbuffer){
+	// image dimensions
+	int width = image.get_width();
+	int height = image.get_height();
+
+	// light direction
+	Vec3f lightSource(0.0, 0.0, -1.0);
+
+	// loop over faces
+	for(int k = 0; k < model.numFaces(); k++){
+		std::vector<Vec3i> face = model.face(k);
+
+		// compute screen and world coordinates for each vertex
+		Vec3f screen[3];
+		Vec3f world[3];
+		Vec2i uv[3];
+		for(int j = 0; j < 3; j++){
+			// coordinates
+			Vec3f p = model.vertex(face[j][0]);
+			screen[j] = Vec3f((p.x+1.)*width/2, (p.y+1.)*height/2, p.z); //world2screen(p);
+			world[j]  = p;
+			// diffuse
+			uv[j] = model.uv(k,j);
+		}
+
+		// compute triangle normal
+		Vec3f normal = (world[2] - world[0]) ^ (world[1] - world[0]);
+		normal.normalize();
+
+		float intensity = normal.dot(lightSource);
+
+		if(intensity > 0){
+			triangle(screen, uv, zbuffer, intensity, model.diffuseMap, image);
 		}
 	}
 }
