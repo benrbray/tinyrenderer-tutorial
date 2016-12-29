@@ -1,5 +1,14 @@
 #include "render.h"
 
+// Colors ----------------------------------------------------------------------
+
+// colors
+const TGAColor white = TGAColor(255, 255, 255, 255);
+const TGAColor gray  = TGAColor(128, 128, 128, 255);
+const TGAColor red   = TGAColor(255, 0,   0,   255);
+const TGAColor green = TGAColor(0,   255, 0,   255);
+const TGAColor blue  = TGAColor(0,   0,   255, 255);
+
 //// LINES /////////////////////////////////////////////////////////////////////
 
 // Bresenham Line Algorithm ----------------------------------------------------
@@ -122,8 +131,40 @@ void triangle(const Vec3f *screen,
 
 //// WIREFRAME /////////////////////////////////////////////////////////////////
 
-void drawWireframe(const char* filename, const char* diffusePath, TGAImage &image, float *zbuffer){
-	return;
+void renderWireframe(const Model &model, TGAImage &image, float *zbuffer){
+	// image dimensions
+	int width = image.get_width();
+	int height = image.get_height();
+
+	// light direction
+	Vec3f lightSource(0.0, 0.0, -1.0);
+
+	// loop over faces
+	for(int k = 0; k < model.numFaces(); k++){
+		std::vector<Vec3i> face = model.face(k);
+
+		// compute screen and world coordinates for each vertex
+		Vec2i screen[3];
+		Vec3f world[3];
+		for(int j = 0; j < 3; j++){
+			// coordinates
+			Vec3f p = model.vertex(face[j][0]);
+			screen[j] = Vec2i((int)((p.x+1.)*width/2), (int)((p.y+1.)*height/2)); //world2screen(p);
+			world[j]  = p;
+		}
+
+		// compute triangle normal
+		Vec3f normal = (world[2] - world[0]) ^ (world[1] - world[0]);
+		normal.normalize();
+
+		float intensity = normal.dot(lightSource);
+
+		if(intensity > 0){
+			line(screen[0], screen[1], image, gray);
+			line(screen[1], screen[2], image, gray);
+			line(screen[2], screen[0], image, gray);
+		}
+	}
 }
 
 

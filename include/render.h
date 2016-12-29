@@ -8,6 +8,8 @@
 
 using namespace std;
 
+//// PRIMITIVES ////////////////////////////////////////////////////////////////
+
 // Lines
 void line(Vec2i v0, Vec2i v1, TGAImage &image, TGAColor color);
 void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color);
@@ -20,13 +22,16 @@ void triangle(const Vec3f *screen,
               const TGAImage &texture,
               TGAImage &image);
 
-void drawWireframe(const char* filename,
-                   const char* diffusePath,
-                   TGAImage &image,
-                   float *zbuffer);
+//// MODEL RENDERING ///////////////////////////////////////////////////////////
+
+void renderWireframe(const Model &model,
+                     TGAImage &image,
+                     float *zbuffer);
 
 void render(const Model &model,
             TGAImage &image,
             float *zbuffer);
+
+////////////////////////////////////////////////////////////////////////////////
 
 #endif
