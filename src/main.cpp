@@ -5,7 +5,6 @@
 #include <iostream>
 #include <limits>
 #include "tgaimage.h"
-#include "vector.h"
 #include "render.h"
 
 using namespace std;

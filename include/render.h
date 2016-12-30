@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include "tgaimage.h"
-#include "vector.h"
+#include "geometry.h"
 #include "model.h"
 
 using namespace std;
