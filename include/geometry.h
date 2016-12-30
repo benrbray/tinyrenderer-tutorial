@@ -34,28 +34,16 @@ typedef Vec2<float> Vec2f;
 typedef Vec2<int> Vec2i;
 
 template <class T>
-inline Vec2<T> operator*(Vec2<T> a, float b){
-    a *= b;
-    return a;
-}
+inline Vec2<T> operator*(Vec2<T> a, float b){ a *= b; return a; }
 
 template <class T>
-inline Vec2<T> operator/(Vec2<T> a, float b){
-    a /= b;
-    return a;
-}
+inline Vec2<T> operator/(Vec2<T> a, float b){ a /= b; return a; }
 
 template <class T>
-inline Vec2<T> operator-(Vec2<T> a, const Vec2<T> &b){
-    a -= b;
-    return a;
-}
+inline Vec2<T> operator-(Vec2<T> a, const Vec2<T> &b){ a -= b; return a; }
 
 template <class T>
-inline Vec2<T> operator+(Vec2<T> a, const Vec2<T> &b){
-    a += b;
-    return a;
-}
+inline Vec2<T> operator+(Vec2<T> a, const Vec2<T> &b){ a += b; return a; }
 
 // Vec3 ------------------------------------------------------------------------
 
@@ -91,28 +79,16 @@ typedef Vec3<float> Vec3f;
 typedef Vec3<int> Vec3i;
 
 template <class T>
-inline Vec3<T> operator*(Vec3<T> a, float b){
-    a *= b;
-    return a;
-}
+inline Vec3<T> operator*(Vec3<T> a, float b){ a *= b; return a; }
 
 template <class T>
-inline Vec3<T> operator/(Vec3<T> a, float b){
-    a /= b;
-    return a;
-}
+inline Vec3<T> operator/(Vec3<T> a, float b){ a /= b; return a; }
 
 template <class T>
-inline Vec3<T> operator-(Vec3<T> a, const Vec3<T> &b){
-    a -= b;
-    return a;
-}
+inline Vec3<T> operator-(Vec3<T> a, const Vec3<T> &b){ a -= b; return a; }
 
 template <class T>
-inline Vec3<T> operator+(Vec3<T> a, const Vec3<T> &b){
-    a += b;
-    return a;
-}
+inline Vec3<T> operator+(Vec3<T> a, const Vec3<T> &b){ a += b; return a; }
 
 template <class T>
 inline Vec3<T> operator^(const Vec3<T> &a, const Vec3<T> &b){
